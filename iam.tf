@@ -78,6 +78,23 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_cloudwatch" {
+  statement {
+    sid     = "AllowLambdaCloudWatchMetrics"
+    effect  = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "allow_lambda_cloudwatch_metrics" {
+  name   = "allow-lambda-code-emit-cloudwatch-metrics"
+  role   = aws_iam_role.lambda.id
+  policy = data.aws_iam_policy_document.lambda_cloudwatch.json
+}
+
 resource "aws_iam_role" "lambda_authorizer" {
   name               = "lambda_authorizer_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
